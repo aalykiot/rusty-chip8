@@ -1,5 +1,5 @@
-use std::{fs::File, io::Read};
-
+use std::fs::File;
+use std::io::Read;
 struct Chip8 {
     pc: u16,
     vx: [u8; 16],
@@ -36,7 +36,7 @@ impl Chip8 {
         file.read(buffer).unwrap();
     }
 
-    fn run_cycle(&mut self) {
+    fn run(&mut self) {
         // convert u16 to usize to get the byte from memory
         let pc = self.pc as usize;
         // compute opcode from memory addresses
@@ -60,5 +60,5 @@ impl Chip8 {
 fn main() {
     let mut chip8 = Chip8::new();
     chip8.load("./programs/airplane.ch8");
-    chip8.run_cycle();
+    chip8.run();
 }
