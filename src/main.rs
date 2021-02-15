@@ -35,9 +35,30 @@ impl Chip8 {
         // read bytes into memory
         file.read(buffer).unwrap();
     }
+
+    fn run_cycle(&mut self) {
+        // convert u16 to usize to get the byte from memory
+        let pc = self.pc as usize;
+        // compute opcode from memory addresses
+        let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
+        // compute opcode nibbles
+        let nibbles = (
+            (opcode >> 12) as u8,
+            (opcode >> 8 & 0x0F) as u8,
+            (opcode >> 4 & 0x00F) as u8,
+            (opcode & 0x000F) as u8,
+        );
+        // compute opcode variables
+        let nnn = opcode & 0x0FFF;
+        let kk = opcode & 0x00FF;
+        let x = nibbles.1;
+        let y = nibbles.2;
+        let n = nibbles.3;
+    }
 }
 
 fn main() {
     let mut chip8 = Chip8::new();
-    chip8.load("./roms/airplane.ch8");
+    chip8.load("./programs/airplane.ch8");
+    chip8.run_cycle();
 }
