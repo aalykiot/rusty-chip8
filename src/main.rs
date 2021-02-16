@@ -1,21 +1,22 @@
 use std::fs::File;
 use std::io::Read;
+
 struct Chip8 {
-    pc: u16,
-    vx: [u8; 16],
-    i: u16,
-    sp: u8,
-    stack: [u16; 16],
-    v_delay: u8,
-    v_sound: u8,
-    memory: [u8; 4096],
+    pc: u16,            // program counter
+    v: [u8; 16],        // registers
+    i: u16,             // i register
+    sp: u8,             // stack pointer
+    stack: [u16; 16],   // stack
+    v_delay: u8,        // delay register
+    v_sound: u8,        // sound register
+    memory: [u8; 4096], // memory
 }
 
 impl Chip8 {
     fn new() -> Chip8 {
         Chip8 {
             pc: 0x200,
-            vx: [0; 16],
+            v: [0; 16],
             i: 0,
             sp: 0,
             stack: [0; 16],
