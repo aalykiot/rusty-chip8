@@ -1,8 +1,12 @@
 use std::fs::File;
 use std::io::Read;
 
+use rand::prelude::*;
+
 type Address = u16;
 type Register = u8;
+
+const PROGRAM_CODE_OFFSET: usize = 0x200;
 
 #[derive(Debug)]
 enum Instruction {
@@ -10,11 +14,11 @@ enum Instruction {
     Return,                             // 00EE
     Jump(Address),                      // 1nnn
     Call(Address),                      // 2nnn
-    SkipIfEqualsByte(Register, u16),    // 3xkk
-    SkipIfNotEqualsByte(Register, u16), // 4xkk
+    SkipIfEqualsByte(Register, u8),     // 3xkk
+    SkipIfNotEqualsByte(Register, u8),  // 4xkk
     SkipIfEqual(Register, Register),    // 5xy0
-    LoadByte(Register, u16),            // 6xkk
-    AddByte(Register, u16),             // 7xkk
+    LoadByte(Register, u8),             // 6xkk
+    AddByte(Register, u8),              // 7xkk
     Move(Register, Register),           // 8xy0
     Or(Register, Register),             // 8xy1
     And(Register, Register),            // 8xy2
@@ -27,7 +31,7 @@ enum Instruction {
     SkipIfNotEqual(Register, Register), // 9xy0
     LoadI(u16),                         // Annn
     JumpPlusZero(Address),              // Bnnn
-    Random(Register, u16),              // Cxkk
+    Random(Register, u8),               // Cxkk
     Draw(Register, Register, u8),       // Dxyn
     SkipIfPressed(Register),            // Ex9E
     SkipIfNotPressed(Register),         // ExA1
@@ -74,20 +78,13 @@ impl Chip8 {
     }
 
     fn load(&mut self, path: &str) {
-        // program space starts at address 0x200
-        let low = 0x200;
-        // open chip8 rom file
+        let memory = &mut self.memory[PROGRAM_CODE_OFFSET..];
         let mut file = File::open(path).unwrap();
-        // create a slice of the cpu's memory
-        let buffer = &mut self.memory[low..];
-        // read bytes into memory
-        file.read(buffer).unwrap();
+
+        file.read(memory).unwrap();
     }
 
-    fn next_instruction(&self) -> Option<Instruction> {
-        let pc = self.pc as usize;
-        let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
-
+    fn to_instruction(&self, opcode: u16) -> Option<Instruction> {
         let nibbles = (
             (opcode >> 12) as u8,
             (opcode >> 8 & 0x0F) as u8,
@@ -96,7 +93,7 @@ impl Chip8 {
         );
 
         let nnn = opcode & 0x0FFF;
-        let kk = opcode & 0x00FF;
+        let kk = (opcode & 0x00FF) as u8;
 
         let x = nibbles.1;
         let y = nibbles.2;
@@ -152,12 +149,152 @@ impl Chip8 {
             _ => None,
         }
     }
+
+    fn run_instruction(&mut self, instruction: Instruction) -> ProgramCounter {
+        // run instruction and return next program counter
+        match instruction {
+            Instruction::ClearDisplay => {
+                // Clear the display.
+                todo!()
+            }
+            Instruction::Return => {
+                let addr = self.stack[self.sp as usize - 1];
+                self.sp -= 1;
+                ProgramCounter::Jump(addr)
+            }
+            Instruction::Jump(addr) => ProgramCounter::Jump(addr),
+            Instruction::Call(addr) => {
+                self.stack[self.sp as usize] = self.pc;
+                self.sp += 1;
+                ProgramCounter::Jump(addr)
+            }
+            Instruction::SkipIfEqualsByte(x, value) => {
+                if self.read_register(x) == value {
+                    ProgramCounter::Skip
+                } else {
+                    ProgramCounter::Next
+                }
+            }
+            Instruction::SkipIfNotEqualsByte(x, value) => {
+                if self.read_register(x) != value {
+                    ProgramCounter::Skip
+                } else {
+                    ProgramCounter::Next
+                }
+            }
+            Instruction::SkipIfEqual(x, y) => {
+                if self.read_register(x) == self.read_register(y) {
+                    ProgramCounter::Skip
+                } else {
+                    ProgramCounter::Next
+                }
+            }
+            Instruction::LoadByte(x, value) => {
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::AddByte(x, value) => {
+                let value = self.read_register(x) + value;
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::Move(x, y) => {
+                let value = self.read_register(y);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::Or(x, y) => {
+                let value = self.read_register(x) | self.read_register(y);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::And(x, y) => {
+                let value = self.read_register(x) & self.read_register(y);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::Xor(x, y) => {
+                let value = self.read_register(x) ^ self.read_register(y);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::Add(x, y) => {
+                let value = self.read_register(x) as u16 + self.read_register(y) as u16;
+                self.load_register(0xF, (value > 255) as u8);
+                self.load_register(x, value as u8);
+                ProgramCounter::Next
+            }
+            Instruction::Sub(x, y) => {
+                let value = self.read_register(x).wrapping_sub(self.read_register(y));
+                let difference = self.read_register(x) > self.read_register(y);
+                self.load_register(0xF, difference as u8);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::ShiftRight(x) => {
+                let value = self.read_register(x) >> 1;
+                self.load_register(0xF, self.read_register(x) & 0b1);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::ReverseSub(x, y) => {
+                let value = self.read_register(y).wrapping_sub(self.read_register(x));
+                let difference = self.read_register(y) > self.read_register(x);
+                self.load_register(0xF, difference as u8);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::ShiftLeft(x) => {
+                let value = self.read_register(x) << 1;
+                self.load_register(0xF, self.read_register(x) >> 7);
+                self.load_register(x, value);
+                ProgramCounter::Next
+            }
+            Instruction::SkipIfNotEqual(x, y) => {
+                if self.read_register(x) != self.read_register(y) {
+                    ProgramCounter::Skip
+                } else {
+                    ProgramCounter::Next
+                }
+            }
+            Instruction::LoadI(value) => {
+                self.i = value;
+                ProgramCounter::Next
+            }
+            Instruction::JumpPlusZero(address) => {
+                let address = address + self.read_register(0) as u16;
+                ProgramCounter::Jump(address)
+            }
+            Instruction::Random(x, value) => {
+                let mut range = rand::thread_rng();
+                let random = range.gen_range(0..255) as u8;
+                self.load_register(x, random & value);
+                ProgramCounter::Next
+            }
+            _ => panic!("Unimplemented instruction {:?}", instruction),
+        }
+    }
+
+    fn read_register(&self, idx: u8) -> u8 {
+        self.v[idx as usize]
+    }
+
+    fn load_register(&mut self, idx: u8, value: u8) {
+        self.v[idx as usize] = value;
+    }
+
+    fn cycle(&mut self) {
+        let pc = self.pc as usize;
+        let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
+
+        let instruction = self.to_instruction(opcode).unwrap();
+        let _next = self.run_instruction(instruction);
+        todo!()
+    }
 }
 
 fn main() {
     let mut chip8 = Chip8::new();
     chip8.load("./programs/airplane.ch8");
-
-    let next = chip8.next_instruction();
-    println!("next chip8 instruction: {:?}", next);
+    chip8.cycle();
 }
