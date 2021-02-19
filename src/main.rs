@@ -1,12 +1,14 @@
+mod display;
+
+use display::Display;
+use rand::prelude::*;
 use std::fs::File;
 use std::io::Read;
-
-use rand::prelude::*;
 
 type Address = u16;
 type Register = u8;
 
-const PROGRAM_CODE_OFFSET: usize = 0x200;
+const PROGRAM_MEMORY_OFFSET: usize = 0x200;
 
 #[derive(Debug)]
 enum Instruction {
@@ -53,14 +55,15 @@ pub enum ProgramCounter {
 }
 
 struct Chip8 {
-    pc: u16,            // program counter
-    v: [u8; 16],        // registers
-    i: u16,             // i register
-    sp: u8,             // stack pointer
-    stack: [u16; 16],   // stack
-    v_delay: u8,        // delay register
-    v_sound: u8,        // sound register
-    memory: [u8; 4096], // memory
+    pc: u16,          // program counter
+    v: [u8; 16],      // registers
+    i: u16,           // i register
+    sp: u8,           // stack pointer
+    stack: [u16; 16], // stack
+    v_delay: u8,      // delay register
+    v_sound: u8,      // sound register
+    memory: [u8; 4096],
+    display: Display,
 }
 
 impl Chip8 {
@@ -74,11 +77,12 @@ impl Chip8 {
             v_delay: 0,
             v_sound: 0,
             memory: [0; 4096],
+            display: Display::new(),
         }
     }
 
     fn load(&mut self, path: &str) {
-        let memory = &mut self.memory[PROGRAM_CODE_OFFSET..];
+        let memory = &mut self.memory[PROGRAM_MEMORY_OFFSET..];
         let mut file = File::open(path).unwrap();
 
         file.read(memory).unwrap();
@@ -154,8 +158,8 @@ impl Chip8 {
         // run instruction and return next program counter
         match instruction {
             Instruction::ClearDisplay => {
-                // Clear the display.
-                todo!()
+                self.display.clear();
+                ProgramCounter::Next
             }
             Instruction::Return => {
                 let addr = self.stack[self.sp as usize - 1];
@@ -271,7 +275,74 @@ impl Chip8 {
                 self.load_register(x, random & value);
                 ProgramCounter::Next
             }
-            _ => panic!("Unimplemented instruction {:?}", instruction),
+            Instruction::Draw(x, y, n) => {
+                let start = self.i as usize;
+                let end = (self.i + n as u16) as usize;
+                let sprite = &self.memory[start..end];
+
+                let collision = self.display.draw(x, y, sprite);
+                self.load_register(0xF, collision as u8);
+
+                ProgramCounter::Next
+            }
+            Instruction::SkipIfPressed(x) => {
+                panic!("Instruction {:?} not yet implemented", instruction);
+            }
+            Instruction::SkipIfNotPressed(x) => {
+                panic!("Instruction {:?} not yet implemented", instruction);
+            }
+            Instruction::LoadDelayTimer(x) => {
+                self.load_register(x, self.v_delay);
+                ProgramCounter::Next
+            }
+            Instruction::WaitForKeyPress(x) => {
+                panic!("Instruction {:?} not yet implemented", instruction);
+            }
+            Instruction::SetDelayTimer(x) => {
+                let value = self.read_register(x);
+                self.v_delay = value;
+                ProgramCounter::Next
+            }
+            Instruction::SetSoundTimer(x) => {
+                let value = self.read_register(x);
+                self.v_sound = value;
+                ProgramCounter::Next
+            }
+            Instruction::AddToI(x) => {
+                self.i += self.read_register(x) as u16;
+                ProgramCounter::Next
+            }
+            Instruction::LoadSprite(x) => {
+                panic!("Instruction {:?} not yet implemented", instruction);
+            }
+            Instruction::BCDRepresentation(x) => {
+                let address = self.i as usize;
+                let value = self.read_register(x);
+
+                self.memory[address] = value / 100;
+                self.memory[address + 1] = (value / 10) % 10;
+                self.memory[address + 2] = (value / 1) % 10;
+
+                ProgramCounter::Next
+            }
+            Instruction::StoreRegisters(x) => {
+                let limit = x as usize + 1;
+                let address = self.i as usize;
+
+                for offset in 0..limit {
+                    self.memory[address + offset] = self.read_register(offset as u8);
+                }
+                ProgramCounter::Next
+            }
+            Instruction::LoadRegisters(x) => {
+                let limit = x as usize + 1;
+                let address = self.i as usize;
+
+                for offset in 0..limit {
+                    self.load_register(offset as u8, self.memory[address + offset]);
+                }
+                ProgramCounter::Next
+            }
         }
     }
 
