@@ -197,7 +197,7 @@ impl Chip8 {
                 ProgramCounter::Next
             }
             Instruction::AddByte(x, value) => {
-                let value = self.read_register(x) + value;
+                let value = self.read_register(x).wrapping_add(value);
                 self.load_register(x, value);
                 ProgramCounter::Next
             }
@@ -276,10 +276,14 @@ impl Chip8 {
             }
             Instruction::Draw(x, y, n) => {
                 let start = self.i as usize;
-                let end = (self.i + n as u16) as usize;
+                let end = start + n as usize;
                 let sprite = &self.memory[start..end];
 
+                let x = self.read_register(x);
+                let y = self.read_register(y);
+
                 let collision = self.display.draw(x, y, sprite);
+
                 self.load_register(0xF, collision as u8);
 
                 ProgramCounter::Next
