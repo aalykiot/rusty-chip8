@@ -62,7 +62,7 @@ pub struct Chip8 {
     v_delay: u8,      // delay register
     v_sound: u8,      // sound register
     memory: [u8; 4096],
-    display: Display,
+    pub display: Display,
 }
 
 impl Chip8 {
@@ -358,7 +358,12 @@ impl Chip8 {
         let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
 
         let instruction = self.to_instruction(opcode).unwrap();
-        let _next = self.run_instruction(instruction);
-        todo!()
+        let next = self.run_instruction(instruction);
+
+        match next {
+            ProgramCounter::Next => self.pc += 2,
+            ProgramCounter::Skip => self.pc += 4,
+            ProgramCounter::Jump(address) => self.pc = address,
+        }
     }
 }

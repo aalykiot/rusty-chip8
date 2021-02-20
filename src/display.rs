@@ -2,7 +2,7 @@ pub const DISPLAY_WIDTH: usize = 64;
 pub const DISPLAY_HEIGHT: usize = 32;
 
 pub struct Display {
-    buffer: [bool; DISPLAY_WIDTH * DISPLAY_HEIGHT],
+    pub buffer: [bool; DISPLAY_WIDTH * DISPLAY_HEIGHT],
 }
 
 impl Display {
