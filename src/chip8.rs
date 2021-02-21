@@ -343,7 +343,9 @@ impl Chip8 {
                 ProgramCounter::Next
             }
             Instruction::LoadSprite(x) => {
-                panic!("Instruction {:?} not yet implemented", instruction);
+                let x = self.read_register(x);
+                self.i = (x * 5) as u16;
+                ProgramCounter::Next
             }
             Instruction::BCDRepresentation(x) => {
                 let address = self.i as usize;
