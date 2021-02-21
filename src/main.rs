@@ -72,9 +72,6 @@ fn main() -> GameResult {
         )
         .build()?;
 
-    let mut chip8 = Chip8::new();
-    chip8.load("./programs/ibm-logo.ch8");
-
     let state = &mut GameState::new();
     event::run(context, event_loop, state)
 }
