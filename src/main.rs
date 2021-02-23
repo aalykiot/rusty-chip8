@@ -6,6 +6,7 @@ use chip8::Chip8;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
+use ggez::input::keyboard::*;
 use ggez::timer;
 use ggez::{Context, ContextBuilder, GameResult};
 
@@ -59,6 +60,44 @@ impl event::EventHandler for GameState {
             self.chip8.cycle();
         }
         Ok(())
+    }
+
+    fn key_down_event(
+        &mut self,
+        _ctx: &mut Context,
+        keycode: KeyCode,
+        _keymods: KeyMods,
+        _repeat: bool,
+    ) {
+        let key = from_key_code(keycode).unwrap();
+        self.chip8.handle_key_down(key);
+    }
+
+    fn key_up_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods) {
+        let key = from_key_code(keycode).unwrap();
+        self.chip8.handle_key_up(key);
+    }
+}
+
+fn from_key_code(key: KeyCode) -> Option<usize> {
+    match key {
+        KeyCode::Key1 => Some(0x0),
+        KeyCode::Key2 => Some(0x1),
+        KeyCode::Key3 => Some(0x2),
+        KeyCode::Key4 => Some(0x3),
+        KeyCode::Q => Some(0x4),
+        KeyCode::W => Some(0x5),
+        KeyCode::E => Some(0x6),
+        KeyCode::R => Some(0x7),
+        KeyCode::A => Some(0x8),
+        KeyCode::S => Some(0x9),
+        KeyCode::D => Some(0xA),
+        KeyCode::F => Some(0xB),
+        KeyCode::Z => Some(0xC),
+        KeyCode::X => Some(0xD),
+        KeyCode::C => Some(0xE),
+        KeyCode::V => Some(0xF),
+        _ => None,
     }
 }
 

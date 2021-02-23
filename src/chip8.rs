@@ -81,6 +81,7 @@ pub struct Chip8 {
     v_delay: u8,      // delay register
     v_sound: u8,      // sound register
     memory: [u8; 4096],
+    keyboard: [bool; 16],
     pub display: Display,
 }
 
@@ -96,6 +97,7 @@ impl Chip8 {
             v_delay: 0,
             v_sound: 0,
             memory: [0; 4096],
+            keyboard: [false; 16],
             display: Display::new(),
         };
         // load built-in fonts into memory
@@ -384,6 +386,14 @@ impl Chip8 {
 
     pub fn load_register(&mut self, idx: u8, value: u8) {
         self.v[idx as usize] = value;
+    }
+
+    pub fn handle_key_down(&mut self, key: usize) {
+        self.keyboard[key] = true;
+    }
+
+    pub fn handle_key_up(&mut self, key: usize) {
+        self.keyboard[key] = false;
     }
 
     pub fn cycle(&mut self) {
