@@ -69,13 +69,15 @@ impl event::EventHandler for GameState {
         _keymods: KeyMods,
         _repeat: bool,
     ) {
-        let key = from_key_code(keycode).unwrap();
-        self.chip8.handle_key_down(key);
+        if let Some(key) = from_key_code(keycode) {
+            self.chip8.handle_key_down(key);
+        }
     }
 
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods) {
-        let key = from_key_code(keycode).unwrap();
-        self.chip8.handle_key_up(key);
+        if let Some(key) = from_key_code(keycode) {
+            self.chip8.handle_key_up(key);
+        }
     }
 }
 
