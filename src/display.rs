@@ -23,10 +23,10 @@ impl Display {
         self.buffer_update = true;
 
         for (block_offset, block) in memory.iter().enumerate() {
-            let pos_y = y as usize + block_offset % DISPLAY_HEIGHT;
+            let pos_y = (y as usize + block_offset) % DISPLAY_HEIGHT;
             for pixel_offset in 0..8 {
                 // get buffer index from x and y coordinates
-                let pos_x = x as usize + pixel_offset % DISPLAY_WIDTH;
+                let pos_x = (x as usize + pixel_offset) % DISPLAY_WIDTH;
                 let idx = self.from_coordinates(pos_x, pos_y);
 
                 let buffer_pixel = self.buffer[idx] as u8;

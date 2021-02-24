@@ -82,6 +82,7 @@ pub struct Chip8 {
     v_sound: u8,      // sound register
     memory: [u8; 4096],
     keyboard: [bool; 16],
+    keyboard_wait_key: Option<u8>,
     pub display: Display,
 }
 
@@ -98,6 +99,7 @@ impl Chip8 {
             v_sound: 0,
             memory: [0; 4096],
             keyboard: [false; 16],
+            keyboard_wait_key: None,
             display: Display::new(),
         };
         // load built-in fonts into memory
@@ -318,17 +320,26 @@ impl Chip8 {
                 ProgramCounter::Next
             }
             Instruction::SkipIfPressed(x) => {
-                panic!("Instruction {:?} not yet implemented", instruction);
+                if self.keyboard[self.read_register(x) as usize] {
+                    ProgramCounter::Skip
+                } else {
+                    ProgramCounter::Next
+                }
             }
             Instruction::SkipIfNotPressed(x) => {
-                panic!("Instruction {:?} not yet implemented", instruction);
+                if !self.keyboard[self.read_register(x) as usize] {
+                    ProgramCounter::Skip
+                } else {
+                    ProgramCounter::Next
+                }
             }
             Instruction::LoadDelayTimer(x) => {
                 self.load_register(x, self.v_delay);
                 ProgramCounter::Next
             }
             Instruction::WaitForKeyPress(x) => {
-                panic!("Instruction {:?} not yet implemented", instruction);
+                self.keyboard_wait_key = Some(x);
+                ProgramCounter::Next
             }
             Instruction::SetDelayTimer(x) => {
                 let value = self.read_register(x);
@@ -390,13 +401,30 @@ impl Chip8 {
 
     pub fn handle_key_down(&mut self, key: usize) {
         self.keyboard[key] = true;
+        if let Some(x) = self.keyboard_wait_key {
+            self.load_register(x, key as u8);
+            self.keyboard_wait_key = None;
+        }
     }
 
     pub fn handle_key_up(&mut self, key: usize) {
         self.keyboard[key] = false;
     }
 
+    pub fn decrement_delay_timer(&mut self) {
+        if self.v_delay > 0 {
+            self.v_delay -= 1;
+        }
+    }
+
     pub fn cycle(&mut self) {
+        // block execution until a key is pressed
+        if self.keyboard_wait_key != None {
+            return;
+        }
+
+        self.decrement_delay_timer();
+
         let pc = self.pc as usize;
         let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
 
