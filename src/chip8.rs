@@ -198,7 +198,7 @@ impl Chip8 {
             }
             Instruction::Jump(addr) => ProgramCounter::Jump(addr),
             Instruction::Call(addr) => {
-                self.stack[self.sp as usize] = self.pc;
+                self.stack[self.sp as usize] = self.pc + 2;
                 self.sp += 1;
                 ProgramCounter::Jump(addr)
             }
