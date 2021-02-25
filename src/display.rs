@@ -10,7 +10,7 @@ impl Display {
     pub fn new() -> Display {
         Display {
             buffer: [false; DISPLAY_WIDTH * DISPLAY_HEIGHT],
-            buffer_update: true,
+            buffer_update: false,
         }
     }
 
@@ -38,7 +38,7 @@ impl Display {
                 self.buffer[idx] = pixel != 0;
 
                 // check if collision detected
-                if buffer_pixel == 1 && sprite_pixel == 1 {
+                if sprite_pixel == 1 && pixel == 0 {
                     collision = true
                 }
             }

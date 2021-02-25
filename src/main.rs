@@ -57,7 +57,8 @@ impl event::EventHandler for GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         const TARGET_FPS: u32 = 60;
         while timer::check_update_time(ctx, TARGET_FPS) {
-            self.chip8.cycle();
+            let delta = timer::delta(ctx).as_secs_f64();
+            self.chip8.cycle(delta);
         }
         Ok(())
     }

@@ -7,6 +7,7 @@ use rand::prelude::*;
 pub type Address = u16;
 pub type Register = u8;
 
+pub const CPU_CLOCK: f64 = 600.0;
 pub const PROGRAM_MEMORY_OFFSET: usize = 0x200;
 
 pub const FONT_MAP: [u8; 80] = [
@@ -192,8 +193,8 @@ impl Chip8 {
                 ProgramCounter::Next
             }
             Instruction::Return => {
-                let addr = self.stack[self.sp as usize - 1];
                 self.sp -= 1;
+                let addr = self.stack[self.sp as usize];
                 ProgramCounter::Jump(addr)
             }
             Instruction::Jump(addr) => ProgramCounter::Jump(addr),
@@ -364,9 +365,9 @@ impl Chip8 {
                 let address = self.i as usize;
                 let value = self.read_register(x);
 
-                self.memory[address] = value / 100;
+                self.memory[address] = (value / 100) % 10;
                 self.memory[address + 1] = (value / 10) % 10;
-                self.memory[address + 2] = (value / 1) % 10;
+                self.memory[address + 2] = value % 10;
 
                 ProgramCounter::Next
             }
@@ -411,30 +412,38 @@ impl Chip8 {
         self.keyboard[key] = false;
     }
 
-    pub fn decrement_delay_timer(&mut self) {
+    pub fn decrement_timers(&mut self) {
         if self.v_delay > 0 {
             self.v_delay -= 1;
         }
+        if self.v_sound > 0 {
+            self.v_sound -= 1;
+        }
     }
 
-    pub fn cycle(&mut self) {
-        // block execution until a key is pressed
-        if self.keyboard_wait_key != None {
-            return;
-        }
+    pub fn cycle(&mut self, delta: f64) {
+        // number of instructions to run in this cycle
+        let num_of_instructions = (CPU_CLOCK * delta).round() as usize;
 
-        self.decrement_delay_timer();
+        self.decrement_timers();
 
-        let pc = self.pc as usize;
-        let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
+        for _ in 0..num_of_instructions {
+            // block execution until a key is pressed
+            if self.keyboard_wait_key != None {
+                return;
+            }
 
-        let instruction = self.to_instruction(opcode).unwrap();
-        let next = self.run_instruction(instruction);
+            let pc = self.pc as usize;
+            let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
 
-        match next {
-            ProgramCounter::Next => self.pc += 2,
-            ProgramCounter::Skip => self.pc += 4,
-            ProgramCounter::Jump(address) => self.pc = address,
+            let instruction = self.to_instruction(opcode).unwrap();
+            let next = self.run_instruction(instruction);
+
+            match next {
+                ProgramCounter::Next => self.pc += 2,
+                ProgramCounter::Skip => self.pc += 4,
+                ProgramCounter::Jump(address) => self.pc = address,
+            }
         }
     }
 }
