@@ -2,6 +2,8 @@ mod chip8;
 mod display;
 
 use piston_window::*;
+use std::fs::File;
+use std::{env, io::Read};
 
 use chip8::Chip8;
 use display::{Display, DISPLAY_HEIGHT, DISPLAY_WIDTH};
@@ -54,15 +56,24 @@ fn draw_screen(display: &mut Display, window: &mut PistonWindow, event: &Event) 
 }
 
 fn main() {
+    // open file containing the chip8 ROM
+    let path = env::args()
+        .nth(1)
+        .expect("you must provide a valid ROM for the emulator");
+
+    let mut file = File::open(path).expect("an error occurred opening the file");
+
+    // get data into a u8 array
+    let mut data = Vec::new();
+    file.read_to_end(&mut data).unwrap();
+
     // create piston window instance
     let mut window: PistonWindow = WindowSettings::new("Chip 8 - Emulator", (640, 320))
         .exit_on_esc(true)
         .build()
         .unwrap();
 
-    // create chip8 emulator and load ROM to memory
-    let mut chip8 = Chip8::new();
-    chip8.load("./programs/ibm-logo.ch8");
+    let mut chip8 = Chip8::new(data);
 
     while let Some(e) = window.next() {
         // event for render updates

@@ -1,6 +1,5 @@
 use crate::display::Display;
-use std::fs::File;
-use std::io::{Read, Write};
+use std::io::Write;
 
 use rand::prelude::*;
 
@@ -88,7 +87,7 @@ pub struct Chip8 {
 }
 
 impl Chip8 {
-    pub fn new() -> Chip8 {
+    pub fn new(data: Vec<u8>) -> Chip8 {
         // create chip8 instance
         let mut chip8 = Chip8 {
             pc: 0x200,
@@ -103,20 +102,20 @@ impl Chip8 {
             keyboard_wait_key: None,
             display: Display::new(),
         };
+
         // load built-in fonts into memory
         let mut buffer = &mut chip8.memory[0..FONT_MAP.len()];
         buffer
             .write(&FONT_MAP)
-            .expect("should load built-in fonts into memory");
+            .expect("couldn't load built-in fonts into memory");
+
+        // load program into memory
+        let mut memory = &mut chip8.memory[PROGRAM_MEMORY_OFFSET..];
+        memory
+            .write(data.as_slice())
+            .expect("couldn't load program into memory");
 
         chip8
-    }
-
-    pub fn load(&mut self, path: &str) {
-        let memory = &mut self.memory[PROGRAM_MEMORY_OFFSET..];
-        let mut file = File::open(path).unwrap();
-
-        file.read(memory).unwrap();
     }
 
     pub fn to_instruction(&self, opcode: u16) -> Option<Instruction> {
