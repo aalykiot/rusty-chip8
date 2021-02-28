@@ -424,8 +424,6 @@ impl Chip8 {
         // number of instructions to run in this cycle
         let num_of_instructions = (CPU_CLOCK * delta).round() as usize;
 
-        self.decrement_timers();
-
         for _ in 0..num_of_instructions {
             // block execution until a key is pressed
             if self.keyboard_wait_key != None {

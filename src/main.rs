@@ -74,22 +74,33 @@ fn main() {
         .unwrap();
 
     let mut chip8 = Chip8::new(data);
+    let mut chip8_time = 0.0;
 
     while let Some(e) = window.next() {
-        // event for render updates
+        // draw to screen updates
         if let Some(_) = e.render_args() {
             draw_screen(&mut chip8.display, &mut window, &e);
         }
-        // event for game state update
+
+        // game state updates
         if let Some(u) = e.update_args() {
+            // run next cycle and keep track of delta time
             chip8.cycle(u.dt);
+            chip8_time += u.dt;
+            // // at 60 Hz decrement chip8's timers
+            if chip8_time > 1.0 / 60.0 {
+                chip8.decrement_timers();
+                chip8_time -= 1.0 / 60.0;
+            }
         }
+
         // event for key press
         if let Some(Button::Keyboard(keycode)) = e.press_args() {
             if let Some(key) = from_key_code(keycode) {
                 chip8.handle_key_down(key);
             }
         }
+
         // event for key release
         if let Some(Button::Keyboard(keycode)) = e.release_args() {
             if let Some(key) = from_key_code(keycode) {
