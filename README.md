@@ -1,8 +1,6 @@
 # rusty-chip8
 
-<div align="center">
-<img src="./assets/space-invaders-screenshot.png" width="400">
-</div>
+<img src="./assets/space-invaders-screenshot.png" width="550">
 
 This a simple chip8 emulator written in the <a href="https://www.rust-lang.org/">Rust programming language</a>. Building an emulator like this one gives you a great feeling of how home computers worked back in the late 70s. It's a nice challenge for people that they want to build something fun and complex at the same time.
 
