@@ -2,20 +2,20 @@ pub const DISPLAY_WIDTH: usize = 64;
 pub const DISPLAY_HEIGHT: usize = 32;
 
 pub struct Display {
-    pub buffer: [bool; DISPLAY_WIDTH * DISPLAY_HEIGHT],
+    pub buffer: [u8; DISPLAY_WIDTH * DISPLAY_HEIGHT],
     pub buffer_update: bool,
 }
 
 impl Display {
     pub fn new() -> Display {
         Display {
-            buffer: [false; DISPLAY_WIDTH * DISPLAY_HEIGHT],
+            buffer: [0; DISPLAY_WIDTH * DISPLAY_HEIGHT],
             buffer_update: false,
         }
     }
 
     pub fn clear(&mut self) {
-        self.buffer = [false; DISPLAY_WIDTH * DISPLAY_HEIGHT];
+        self.buffer = [0; DISPLAY_WIDTH * DISPLAY_HEIGHT];
     }
 
     pub fn draw(&mut self, x: u8, y: u8, memory: &[u8]) -> bool {
@@ -29,13 +29,12 @@ impl Display {
                 let pos_x = (x as usize + pixel_offset) % DISPLAY_WIDTH;
                 let idx = self.from_coordinates(pos_x, pos_y);
 
-                let buffer_pixel = self.buffer[idx] as u8;
+                let buffer_pixel = self.buffer[idx];
                 let sprite_pixel = (block >> (7 - pixel_offset)) & 1;
 
                 // xor the buffer pixel with the sprite pixel
                 let pixel = buffer_pixel ^ sprite_pixel;
-
-                self.buffer[idx] = pixel != 0;
+                self.buffer[idx] = pixel;
 
                 // check if collision detected
                 if sprite_pixel == 1 && pixel == 0 {

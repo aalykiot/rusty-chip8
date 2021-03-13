@@ -42,7 +42,7 @@ fn draw_screen(display: &mut Display, window: &mut PistonWindow, event: &Event) 
         for x in 0..DISPLAY_WIDTH {
             for y in 0..DISPLAY_HEIGHT {
                 let index = x + DISPLAY_WIDTH * y;
-                if display.buffer[index] {
+                if display.buffer[index] == 1 {
                     rectangle(
                         color::WHITE,
                         [x as f64 * 10.0, y as f64 * 10.0, 10.0, 10.0],
