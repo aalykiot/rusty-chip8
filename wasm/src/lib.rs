@@ -1,15 +1,23 @@
-use crate::display::Display;
+mod display;
+
+use display::Display;
+use js_sys::Math;
 use std::io::Write;
+use wasm_bindgen::prelude::*;
 
-use rand::prelude::*;
+// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+// allocator.
+#[cfg(feature = "wee_alloc")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-pub type Address = u16;
-pub type Register = u8;
+type Address = u16;
+type Register = u8;
 
-pub const CPU_CLOCK: f64 = 600.0;
-pub const PROGRAM_MEMORY_OFFSET: usize = 0x200;
+const CPU_CLOCK: f64 = 600.0;
+const PROGRAM_MEMORY_OFFSET: usize = 0x200;
 
-pub const FONT_MAP: [u8; 80] = [
+const FONT_MAP: [u8; 80] = [
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
     0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -66,12 +74,13 @@ pub enum Instruction {
     LoadRegisters(Register),            // Fx65
 }
 
-pub enum ProgramCounter {
+enum ProgramCounter {
     Next,
     Skip,
     Jump(u16),
 }
 
+#[wasm_bindgen]
 pub struct Chip8 {
     pc: u16,          // program counter
     v: [u8; 16],      // registers
@@ -86,9 +95,9 @@ pub struct Chip8 {
     pub display: Display,
 }
 
+#[wasm_bindgen]
 impl Chip8 {
-    pub fn new(data: Vec<u8>) -> Chip8 {
-        // create chip8 instance
+    pub fn new(data: &[u8]) -> Chip8 {
         let mut chip8 = Chip8 {
             pc: 0x200,
             v: [0; 16],
@@ -103,22 +112,69 @@ impl Chip8 {
             display: Display::new(),
         };
 
-        // load built-in fonts into memory
+        // Load built-in fonts into memory
         let mut buffer = &mut chip8.memory[0..FONT_MAP.len()];
         buffer
             .write(&FONT_MAP)
             .expect("couldn't load built-in fonts into memory");
 
-        // load program into memory
+        // Load program into memory
         let mut memory = &mut chip8.memory[PROGRAM_MEMORY_OFFSET..];
         memory
-            .write(data.as_slice())
+            .write(data)
             .expect("couldn't load program into memory");
 
         chip8
     }
 
-    pub fn to_instruction(&self, opcode: u16) -> Option<Instruction> {
+    pub fn handle_key_down(&mut self, key: usize) {
+        self.keyboard[key] = true;
+        if let Some(x) = self.keyboard_wait_key {
+            self.load_register(x, key as u8);
+            self.keyboard_wait_key = None;
+        }
+    }
+
+    pub fn handle_key_up(&mut self, key: usize) {
+        self.keyboard[key] = false;
+    }
+
+    pub fn decrement_timers(&mut self) {
+        if self.v_delay > 0 {
+            self.v_delay -= 1;
+        }
+        if self.v_sound > 0 {
+            self.v_sound -= 1;
+        }
+    }
+
+    pub fn cycle(&mut self, delta: f64) {
+        // number of instructions to run in this cycle
+        let num_of_instructions = (CPU_CLOCK * delta).round() as usize;
+
+        for _ in 0..num_of_instructions {
+            // block execution until a key is pressed
+            if self.keyboard_wait_key != None {
+                return;
+            }
+
+            let pc = self.pc as usize;
+            let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
+
+            let instruction = self.to_instruction(opcode).unwrap();
+            let next = self.run_instruction(instruction);
+
+            match next {
+                ProgramCounter::Next => self.pc += 2,
+                ProgramCounter::Skip => self.pc += 4,
+                ProgramCounter::Jump(address) => self.pc = address,
+            }
+        }
+    }
+}
+
+impl Chip8 {
+    fn to_instruction(&self, opcode: u16) -> Option<Instruction> {
         let nibbles = (
             (opcode >> 12) as u8,
             (opcode >> 8 & 0x0F) as u8,
@@ -184,7 +240,7 @@ impl Chip8 {
         }
     }
 
-    pub fn run_instruction(&mut self, instruction: Instruction) -> ProgramCounter {
+    fn run_instruction(&mut self, instruction: Instruction) -> ProgramCounter {
         // run instruction and return next program counter
         match instruction {
             Instruction::ClearDisplay => {
@@ -300,8 +356,7 @@ impl Chip8 {
                 ProgramCounter::Jump(address)
             }
             Instruction::Random(x, value) => {
-                let mut range = rand::thread_rng();
-                let random = range.gen_range(0..255) as u8;
+                let random = unsafe { (Math::random() * 255.0) as u8 };
                 self.load_register(x, random & value);
                 ProgramCounter::Next
             }
@@ -391,56 +446,11 @@ impl Chip8 {
         }
     }
 
-    pub fn read_register(&self, idx: u8) -> u8 {
+    fn read_register(&self, idx: u8) -> u8 {
         self.v[idx as usize]
     }
 
-    pub fn load_register(&mut self, idx: u8, value: u8) {
+    fn load_register(&mut self, idx: u8, value: u8) {
         self.v[idx as usize] = value;
-    }
-
-    pub fn handle_key_down(&mut self, key: usize) {
-        self.keyboard[key] = true;
-        if let Some(x) = self.keyboard_wait_key {
-            self.load_register(x, key as u8);
-            self.keyboard_wait_key = None;
-        }
-    }
-
-    pub fn handle_key_up(&mut self, key: usize) {
-        self.keyboard[key] = false;
-    }
-
-    pub fn decrement_timers(&mut self) {
-        if self.v_delay > 0 {
-            self.v_delay -= 1;
-        }
-        if self.v_sound > 0 {
-            self.v_sound -= 1;
-        }
-    }
-
-    pub fn cycle(&mut self, delta: f64) {
-        // number of instructions to run in this cycle
-        let num_of_instructions = (CPU_CLOCK * delta).round() as usize;
-
-        for _ in 0..num_of_instructions {
-            // block execution until a key is pressed
-            if self.keyboard_wait_key != None {
-                return;
-            }
-
-            let pc = self.pc as usize;
-            let opcode: u16 = (self.memory[pc] as u16) << 8 | self.memory[pc + 1] as u16;
-
-            let instruction = self.to_instruction(opcode).unwrap();
-            let next = self.run_instruction(instruction);
-
-            match next {
-                ProgramCounter::Next => self.pc += 2,
-                ProgramCounter::Skip => self.pc += 4,
-                ProgramCounter::Jump(address) => self.pc = address,
-            }
-        }
     }
 }

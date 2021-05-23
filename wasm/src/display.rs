@@ -1,9 +1,24 @@
-pub const DISPLAY_WIDTH: usize = 64;
-pub const DISPLAY_HEIGHT: usize = 32;
+use wasm_bindgen::prelude::*;
 
+const DISPLAY_WIDTH: usize = 64;
+const DISPLAY_HEIGHT: usize = 32;
+
+#[wasm_bindgen]
+#[derive(Clone, Copy)]
 pub struct Display {
-    pub buffer: [u8; DISPLAY_WIDTH * DISPLAY_HEIGHT],
-    pub buffer_update: bool,
+    buffer: [u8; DISPLAY_WIDTH * DISPLAY_HEIGHT],
+    buffer_update: bool,
+}
+
+#[wasm_bindgen]
+impl Display {
+    pub fn get_ptr(&self) -> *const u8 {
+        self.buffer.as_ptr()
+    }
+
+    pub fn should_update(&self) -> bool {
+        self.buffer_update
+    }
 }
 
 impl Display {
@@ -47,9 +62,5 @@ impl Display {
 
     pub fn from_coordinates(&self, x: usize, y: usize) -> usize {
         (x + DISPLAY_WIDTH * y) as usize
-    }
-
-    pub fn should_update(&self) -> bool {
-        self.buffer_update
     }
 }
