@@ -15,12 +15,12 @@
         </h1>
         <ForkBanner />
       </div>
-      <div class="w-640 h-320 bg-gray-900 rounded-lg shadow-md mt-8"></div>
+      <canvas id="display" width="640" height="320" class="bg-gray-900 border-2 border-gray-900 rounded-lg shadow-md mt-8"></canvas>
       <div class="mt-8 flex justify-center items-center">
-        <button
-          class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+        <button id="upload-button" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
           Upload ROM...
         </button>
+        <input type="file" id="file-input" class="hidden" accept=".ch8" />
         <span class="font-semibold mx-4 text-xs"> OR </span>
         <select
           class="py-2 px-4 pr-12 bg-white text-gray-800 font-semibold border border-gray-400 rounded shadow cursor-pointer hover:bg-gray-100">
@@ -79,10 +79,18 @@
     </div>
     <div class="w-full mt-16">
       <div class="flex items-center justify-center mb-4 border-t w-640 mx-auto pt-4">
-        <span class="text-sm mr-2">Built with ❤️ by</span>
-          <span class="cursor-pointer font-semibold hover:underline">
-            <a href="https://github.com/alexalikiotis" target="_blank" rel="noreferrer">@alexalikiotis</a>
-          </span>
+        <span class="text-sm">Built with</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-600 mx-1" viewBox="0 0 20 20" fill="currentColor">
+          <path 
+            fill-rule="evenodd"
+            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+            clip-rule="evenodd" 
+          />
+        </svg>
+        <span class="text-sm">by</span>
+        <span class="cursor-pointer text-sm font-semibold hover:underline ml-1">
+          <a href="https://github.com/alexalikiotis" target="_blank" rel="noreferrer">@alexalikiotis</a>
+        </span>
       </div>
     </div>
     <script type="module" src="dist/main.js"></script>
