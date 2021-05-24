@@ -17,10 +17,11 @@ import {
   filter,
 } from 'rxjs/operators';
 
-import { toUint8Array } from './utils/transforms';
+import { toUint8Array, getUint8Array } from './utils/transforms';
 import { translateKey } from './utils/keys';
 import { render } from './utils/graphics';
 
+import list from './assets/list.json';
 import init, { Chip8 } from '../wasm/pkg';
 
 // Mocking jquery
@@ -30,9 +31,11 @@ const main = async () => {
   // Initialize web-assembly
   const { memory } = await init();
 
-  const canvas = $('display') as HTMLCanvasElement;
   const uploadButton = $('upload-button');
   const fileInput = $('file-input');
+
+  const canvas = $('display') as HTMLCanvasElement;
+  const selectInput = $('select-input') as HTMLSelectElement;
 
   // When the user clicks the upload button trigger the file input
   fromEvent(uploadButton, 'click').subscribe(() => fileInput.click());
@@ -41,11 +44,20 @@ const main = async () => {
     pluck('target', 'files'),
     map((files) => files[0]),
     filter((file) => file != undefined),
-    switchMap((file) => from(toUint8Array(file))),
+    switchMap((file) => from(toUint8Array(file)).pipe()),
     share()
   );
 
-  const chip8$ = merge([upload$]).pipe(
+  const select$ = fromEvent(selectInput, 'change').pipe(
+    map(() => selectInput.value),
+    map((name) => list.binaries.find((item) => item.name === name)),
+    pluck('url'),
+    filter((url) => url !== undefined),
+    switchMap((url) => from(getUint8Array(url))),
+    share()
+  );
+
+  const chip8$ = merge([upload$, select$]).pipe(
     mergeAll(),
     map((binary) => Chip8.new(binary)),
     share()

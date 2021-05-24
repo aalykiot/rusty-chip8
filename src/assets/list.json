@@ -1,0 +1,12 @@
+{
+  "binaries": [
+    { 
+      "name": "space-invaders", 
+      "url": "https://raw.githubusercontent.com/kripod/chip8-roms/master/games/Space%20Invaders%20%5BDavid%20Winter%5D.ch8" 
+    },
+    {
+      "name": "ibm-logo",
+      "url": "https://raw.githubusercontent.com/kripod/chip8-roms/master/programs/IBM%20Logo.ch8"
+    }
+  ]
+}
