@@ -14,13 +14,17 @@
     "rxjs": "^7.1.0"
   },
   "devDependencies": {
+    "@snowpack/plugin-postcss": "^1.4.0",
+    "@tailwindcss/forms": "^0.3.2",
     "@typescript-eslint/eslint-plugin": "^4.24.0",
     "@typescript-eslint/parser": "^4.24.0",
     "eslint": "^7.27.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.3",
+    "postcss": "^8.3.0",
     "rsw-node": "^0.1.2",
     "snowpack": "^3.5.1",
-    "snowpack-plugin-wasm-pack": "^1.1.0"
+    "snowpack-plugin-wasm-pack": "^1.1.0",
+    "tailwindcss": "^2.1.2"
   }
 }

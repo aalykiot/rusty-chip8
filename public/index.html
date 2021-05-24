@@ -3,11 +3,88 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="src/favicon.svg" />
+    <link rel="stylesheet" type="text/css" href="/css/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chip8 Emulator</title>
+    <title>Snowpack App</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div class="w-640 mx-auto my-4">
+      <div class="flex items-center justify-between mt-8">
+        <h1 class="text-2xl font-semibold font-mono text-gray-900">
+          Chip.8 Playground
+        </h1>
+        <ForkBanner />
+      </div>
+      <div class="w-640 h-320 bg-gray-900 rounded-lg shadow-md mt-8"></div>
+      <div class="mt-8 flex justify-center items-center">
+        <button
+          class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+          Upload ROM...
+        </button>
+        <span class="font-semibold mx-4 text-xs"> OR </span>
+        <select
+          class="py-2 px-4 pr-12 bg-white text-gray-800 font-semibold border border-gray-400 rounded shadow cursor-pointer hover:bg-gray-100">
+          <option>Select from the list...</option>
+          <option>Space Invaders</option>
+          <option>IBM Logo</option>
+          <option>Tron</option>
+        </select>
+      </div>
+      <div class="mt-16">
+        <h2 class="font-semibold text-xl font-mono">Key Mappings</h2>
+        <div class="flex justify-center items-center mt-6">
+          <div class="grid grid-cols-4 gap-4 flex-1">
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">1</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">2</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">3</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">4</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">Q</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">W</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">E</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">R</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">A</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">S</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">D</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">F</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">Z</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">X</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">C</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">V</div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="mx-10 text-gray-800" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+          <div class="grid grid-cols-4 gap-4 flex-1">
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">1</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">2</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">3</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">C</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">4</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">5</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">6</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">D</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">7</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">8</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">9</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">E</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">A</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">0</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">B</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">F</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w-full mt-16">
+      <div class="flex items-center justify-center mb-4 border-t w-640 mx-auto pt-4">
+        <span class="text-sm mr-2">Built with ❤️ by</span>
+          <span class="cursor-pointer font-semibold hover:underline">
+            <a href="https://github.com/alexalikiotis" target="_blank" rel="noreferrer">@alexalikiotis</a>
+          </span>
+      </div>
+    </div>
     <script type="module" src="dist/main.js"></script>
   </body>
 </html>
