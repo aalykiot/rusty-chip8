@@ -2,16 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
     <link rel="icon" type="image/svg+xml" href="src/favicon.svg" />
     <link rel="stylesheet" type="text/css" href="/css/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Snowpack App</title>
+    <title>Chip8 Emulator - Written in Rust exported in WebAssembly</title>
   </head>
   <body>
     <div class="w-640 mx-auto my-4">
-      <div class="flex items-center justify-between mt-8">
-        <h1 class="text-2xl font-semibold font-mono text-gray-900">
-          Chip.8 Playground
+      <div class="flex items-center mt-8">
+        <a href="https://github.com/alexalikiotis/rusty-chip8/blob/web-assembly/wasm/src/lib.rs" alt="chip8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-900" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13 7H7v6h6V7z" />
+            <path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd" />
+          </svg>
+        </a>
+        <h1 class="text-xl font-semibold font-mono text-gray-900 ml-3">
+          Chip8.rs
         </h1>
         <ForkBanner />
       </div>
@@ -28,10 +35,13 @@
           <option>Select from the list...</option>
           <option value="space-invaders">Space Invaders</option>
           <option value="ibm-logo">IBM Logo</option>
+          <option value="tetris">Tetris</option>
+          <option value="pong">Pong</option>Tic Tac Toe</option>
+          <option value="puzzle">Puzzle</option>
         </select>
       </div>
       <div class="mt-16">
-        <h2 class="font-semibold text-xl font-mono">Key Mappings</h2>
+        <h2 class="font-semibold text-xl font-mono text-gray-900">Key Mappings</h2>
         <div class="flex justify-center items-center mt-6">
           <div class="grid grid-cols-4 gap-4 flex-1">
             <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">1</div>
@@ -77,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="w-full mt-16">
+    <div class="w-full mt-16 text-gray-900">
       <div class="flex items-center justify-center mb-4 border-t w-640 mx-auto pt-4">
         <span class="text-sm">Built with</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-600 mx-1" viewBox="0 0 20 20" fill="currentColor">
@@ -93,6 +103,7 @@
         </span>
       </div>
     </div>
+    <a class="github-fork-ribbon" href="https://github.com/alexalikiotis/rusty-chip8/tree/web-assembly" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
     <script type="module" src="dist/main.js"></script>
   </body>
 </html>
