@@ -1,0 +1,15 @@
+{
+  "name": "rusty-chip8",
+  "collaborators": [
+    "Alex Alikiotis <alexalikiotis5@gmail.com>"
+  ],
+  "version": "1.0.0",
+  "files": [
+    "index_bg.wasm",
+    "index.js",
+    "index.d.ts"
+  ],
+  "module": "index.js",
+  "types": "index.d.ts",
+  "sideEffects": false
+}

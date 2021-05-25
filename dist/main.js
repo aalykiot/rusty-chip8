@@ -15,11 +15,11 @@ import {
   scan,
   filter
 } from "../_snowpack/pkg/rxjs/operators.js";
+import init, {Chip8} from "./chip8/pkg/index.js";
 import {toUint8Array, getUint8Array} from "./utils/transforms.js";
 import {translateKey} from "./utils/keys.js";
 import {render} from "./utils/graphics.js";
 import list from "./assets/list.json.proxy.js";
-import init, {Chip8} from "../wasm/pkg";
 const $ = (element) => document.getElementById(element);
 const main = async () => {
   const {memory} = await init();
