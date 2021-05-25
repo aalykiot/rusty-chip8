@@ -3,6 +3,13 @@ module.exports = {
     src: '/dist',
     public: '/',
   },
+  exclude: [
+    '**/*.rs',
+    '**/*.lock',
+    '**/*.toml',
+    '**/*.md',
+    '**/chip8/target/**',
+  ],
   devOptions: {
     tailwindConfig: './tailwind.config.js',
   },
@@ -11,7 +18,7 @@ module.exports = {
     [
       'snowpack-plugin-wasm-pack',
       {
-        projectPath: './wasm',
+        projectPath: './src/chip8',
       },
     ],
   ],

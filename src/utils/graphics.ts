@@ -1,4 +1,4 @@
-import { Chip8 } from '../../wasm/pkg';
+import { Chip8 } from 'rusty-chip8';
 
 const render = (
   canvas: HTMLCanvasElement,

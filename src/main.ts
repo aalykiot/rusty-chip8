@@ -17,12 +17,13 @@ import {
   filter,
 } from 'rxjs/operators';
 
+import init, { Chip8 } from 'rusty-chip8';
+
 import { toUint8Array, getUint8Array } from './utils/transforms';
 import { translateKey } from './utils/keys';
 import { render } from './utils/graphics';
 
 import list from './assets/list.json';
-import init, { Chip8 } from '../wasm/pkg';
 
 // Mocking jquery
 const $ = (element): HTMLElement => document.getElementById(element);
