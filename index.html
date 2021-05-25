@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
+    <link rel="icon" type="image/svg+xml" href="src/favicon.svg" />
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chip8 Emulator - Written in Rust exported in WebAssembly</title>
+  </head>
+  <body>
+    <div class="w-640 mx-auto my-4">
+      <div class="flex items-center mt-8">
+        <a href="https://github.com/alexalikiotis/rusty-chip8/blob/web-assembly/wasm/src/lib.rs" alt="chip8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-900" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13 7H7v6h6V7z" />
+            <path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd" />
+          </svg>
+        </a>
+        <h1 class="text-xl font-semibold font-mono text-gray-900 ml-3">
+          Chip8.rs
+        </h1>
+        <ForkBanner />
+      </div>
+      <canvas id="display" width="640" height="320" class="bg-gray-900 border-2 border-gray-900 rounded-lg shadow-md mt-8"></canvas>
+      <div class="mt-8 flex justify-center items-center">
+        <button id="upload-button" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow">
+          Upload ROM...
+        </button>
+        <input type="file" id="file-input" class="hidden" accept=".ch8" />
+        <span class="font-semibold mx-4 text-xs"> OR </span>
+        <select
+          id="select-input"
+          class="py-2 px-4 pr-12 bg-white text-gray-800 font-semibold border border-gray-400 rounded shadow cursor-pointer hover:bg-gray-100">
+          <option>Select from the list...</option>
+          <option value="space-invaders">Space Invaders</option>
+          <option value="ibm-logo">IBM Logo</option>
+          <option value="tetris">Tetris</option>
+          <option value="pong">Pong</option>Tic Tac Toe</option>
+          <option value="puzzle">Puzzle</option>
+        </select>
+      </div>
+      <div class="mt-16">
+        <h2 class="font-semibold text-xl font-mono text-gray-900">Key Mappings</h2>
+        <div class="flex justify-center items-center mt-6">
+          <div class="grid grid-cols-4 gap-4 flex-1">
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">1</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">2</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">3</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">4</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">Q</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">W</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">E</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">R</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">A</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">S</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">D</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">F</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">Z</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">X</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">C</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">V</div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="mx-10 text-gray-800" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+          <div class="grid grid-cols-4 gap-4 flex-1">
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">1</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">2</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">3</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">C</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">4</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">5</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">6</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">D</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">7</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">8</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">9</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">E</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">A</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">0</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">B</div>
+            <div class="p-4 w-12 h-12 text-gray-800 flex justify-center items-center font-semibold border border-gray-400 rounded shadow bg-yellow-100">F</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w-full mt-16 text-gray-900">
+      <div class="flex items-center justify-center mb-4 border-t w-640 mx-auto pt-4">
+        <span class="text-sm">Built with</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-600 mx-1" viewBox="0 0 20 20" fill="currentColor">
+          <path 
+            fill-rule="evenodd"
+            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+            clip-rule="evenodd" 
+          />
+        </svg>
+        <span class="text-sm">by</span>
+        <span class="cursor-pointer text-sm font-semibold hover:underline ml-1">
+          <a href="https://github.com/alexalikiotis" target="_blank" rel="noreferrer">@alexalikiotis</a>
+        </span>
+      </div>
+    </div>
+    <a class="github-fork-ribbon" href="https://github.com/alexalikiotis/rusty-chip8/tree/web-assembly" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+    <script type="module" src="dist/main.js"></script>
+  </body>
+</html>
