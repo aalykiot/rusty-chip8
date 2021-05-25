@@ -5,7 +5,7 @@ import {
   interval,
   animationFrameScheduler,
   combineLatest
-} from "../_snowpack/pkg/rxjs.js";
+} from "../__snowpack/pkg/rxjs.js";
 import {
   pluck,
   map,
@@ -14,7 +14,7 @@ import {
   mergeAll,
   scan,
   filter
-} from "../_snowpack/pkg/rxjs/operators.js";
+} from "../__snowpack/pkg/rxjs/operators.js";
 import {toUint8Array, getUint8Array} from "./utils/transforms.js";
 import {translateKey} from "./utils/keys.js";
 import {render} from "./utils/graphics.js";
