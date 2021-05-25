@@ -1,3 +1,9 @@
+# snowpack
+build/
 snowpack.config.js
+
+# postcss
 postcss.config.js
+
+# tailwindcss
 tailwind.config.js
