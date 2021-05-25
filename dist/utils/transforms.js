@@ -1,4 +1,4 @@
-import axios from "../../__snowpack/pkg/axios.js";
+import axios from "../../_snowpack/pkg/axios.js";
 const toArrayBuffer = (file) => {
   return new Promise((resolve) => {
     const reader = new FileReader();
