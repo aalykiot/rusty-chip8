@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "snowpack dev",
     "build": "snowpack build",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "wasm-pack build ./src/chip8 --target web --out-name index"
   },
   "dependencies": {
     "axios": "^0.21.1",
