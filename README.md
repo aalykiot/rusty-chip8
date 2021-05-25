@@ -1,8 +1,13 @@
 # rusty-chip8
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+![Build and Deploy](https://github.com/alexalikiotis/rusty-chip8/actions/workflows/build-and-deploy.yaml/badge.svg)
+
 A Chip8 emulator written in Rust exported in WebAssembly.
 
 > <a href="https://en.wikipedia.org/wiki/CHIP-8">Chip-8</a> is a simple, interpreted, programming language which was first used on some do-it-yourself computer systems in the late 1970s and early 1980s.
+
+### [Demo](https://alexalikiotis.github.io/rusty-chip8/)
 
 ## Installation
 
