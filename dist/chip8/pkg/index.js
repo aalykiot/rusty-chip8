@@ -60,7 +60,6 @@ export class Chip8 {
         wasm.__wbg_chip8_free(ptr);
     }
     /**
-    * @returns {Display}
     */
     get display() {
         var ret = wasm.__wbg_get_chip8_display(this.ptr);
@@ -184,7 +183,7 @@ async function init(input) {
     }
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbg_random_29218b0f217b2697 = typeof Math.random == 'function' ? Math.random : notDefined('Math.random');
+    imports.wbg.__wbg_random_7b8246250fd79f60 = typeof Math.random == 'function' ? Math.random : notDefined('Math.random');
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
