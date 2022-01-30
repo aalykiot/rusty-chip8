@@ -4,7 +4,7 @@ import {
   merge,
   interval,
   animationFrameScheduler,
-  combineLatest,
+  combineLatest
 } from 'rxjs';
 
 import {
@@ -14,7 +14,7 @@ import {
   share,
   mergeAll,
   scan,
-  filter,
+  filter
 } from 'rxjs/operators';
 
 import init, { Chip8 } from 'rusty-chip8';
@@ -66,7 +66,7 @@ const main = async () => {
 
   const state = () => ({
     time: performance.now(),
-    delta: 0,
+    delta: 0
   });
 
   const clock$ = chip8$.pipe(
@@ -75,7 +75,7 @@ const main = async () => {
       const time = performance.now();
       return {
         time,
-        delta: (time - previous.time) / 1000,
+        delta: (time - previous.time) / 1000
       };
     }, state())
   );

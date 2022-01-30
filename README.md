@@ -7,7 +7,7 @@ A Chip8 emulator written in Rust exported in WebAssembly.
 
 > <a href="https://en.wikipedia.org/wiki/CHIP-8">Chip-8</a> is a simple, interpreted, programming language which was first used on some do-it-yourself computer systems in the late 1970s and early 1980s.
 
-### [Demo](https://alexalikiotis.github.io/rusty-chip8/)
+### [Demo](https://aalykiot.github.io/rusty-chip8/)
 
 ## Installation
 
@@ -22,7 +22,7 @@ curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 Clone the repository
 
 ```sh
-git clone https://github.com/alexalikiotis/rusty-chip8
+git clone https://github.com/aalykiot/rusty-chip8
 ```
 
 Go inside the directory
